@@ -6,7 +6,7 @@ A full-stack Invoice Generator application built with Angular and Spring Boot.
 Features
 
 Create invoices with company details, customer details, and line items
-Auto-generated invoice numbers
+Auto-generated invoice number
 View invoice details in a read-only panel
 Search invoices by invoice number
 Edit existing invoices without creating duplicate IDs
