@@ -1,0 +1,42 @@
+package com.example.invoice_generator.service;
+
+import java.io.ByteArrayOutputStream;
+
+import org.springframework.stereotype.Service;
+
+import com.example.invoice_generator.model.Invoice;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.pdf.PdfWriter;
+
+@Service
+public class PdfGenerationService {
+	public byte[] generateInvoicePdf(Invoice invoice) {
+
+		try {
+			ByteArrayOutputStream out = new ByteArrayOutputStream();
+			Document document = new Document();
+
+			PdfWriter.getInstance(document, out);
+			document.open();
+
+			document.add(new Paragraph("INVOICE"));
+			document.add(new Paragraph("Invoice Number: " + invoice.getInvoiceNumber()));
+			document.add(new Paragraph("Invoice Date: " + invoice.getInvoiceDate()));
+			document.add(new Paragraph("Status: " + invoice.getStatus()));
+
+			document.add(new Paragraph(" "));
+			document.add(new Paragraph("Company: " + invoice.getCompanyDetails().getName()));
+			document.add(new Paragraph("Customer: " + invoice.getCustomerDetails().getName()));
+
+			document.add(new Paragraph(" "));
+			document.add(new Paragraph("Grand Total: " + invoice.getGrandTotal()));
+
+			document.close();
+			return out.toByteArray();
+
+		} catch (Exception e) {
+			throw new RuntimeException("Error while generating PDF", e);
+		}
+	}
+}

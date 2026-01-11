@@ -1,0 +1,110 @@
+package com.example.invoice_generator.model;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
+
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+@Document(collection = "invoices")
+public class Invoice {
+
+	@Id
+	private String id;
+
+	private String invoiceNumber;
+	private LocalDate invoiceDate;
+
+	private CompanyDetails companyDetails;
+	private CustomerDetails customerDetails;
+
+	private List<InvoiceItem> items;
+
+	private BigDecimal subTotal;
+	private BigDecimal taxAmount;
+	private BigDecimal grandTotal;
+
+	private LocalDateTime createdAt;
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	public String getInvoiceNumber() {
+		return invoiceNumber;
+	}
+
+	public void setInvoiceNumber(String invoiceNumber) {
+		this.invoiceNumber = invoiceNumber;
+	}
+
+	public LocalDate getInvoiceDate() {
+		return invoiceDate;
+	}
+
+	public void setInvoiceDate(LocalDate invoiceDate) {
+		this.invoiceDate = invoiceDate;
+	}
+
+	public CompanyDetails getCompanyDetails() {
+		return companyDetails;
+	}
+
+	public void setCompanyDetails(CompanyDetails companyDetails) {
+		this.companyDetails = companyDetails;
+	}
+
+	public CustomerDetails getCustomerDetails() {
+		return customerDetails;
+	}
+
+	public void setCustomerDetails(CustomerDetails customerDetails) {
+		this.customerDetails = customerDetails;
+	}
+
+	public List<InvoiceItem> getItems() {
+		return items;
+	}
+
+	public void setItems(List<InvoiceItem> items) {
+		this.items = items;
+	}
+
+	public BigDecimal getSubTotal() {
+		return subTotal;
+	}
+
+	public void setSubTotal(BigDecimal subTotal) {
+		this.subTotal = subTotal;
+	}
+
+	public BigDecimal getTaxAmount() {
+		return taxAmount;
+	}
+
+	public void setTaxAmount(BigDecimal taxAmount) {
+		this.taxAmount = taxAmount;
+	}
+
+	public BigDecimal getGrandTotal() {
+		return grandTotal;
+	}
+
+	public void setGrandTotal(BigDecimal grandTotal) {
+		this.grandTotal = grandTotal;
+	}
+
+	public LocalDateTime getCreatedAt() {
+		return createdAt;
+	}
+
+	public void setCreatedAt(LocalDateTime createdAt) {
+		this.createdAt = createdAt;
+	}
+}

@@ -1,0 +1,163 @@
+<div class="app-header">
+  <h1>Invoice Generator</h1>
+</div>
+
+<div class="page-container">
+
+<div class="left-panel">
+  <div class="form-section">
+    <h2>Company Details</h2>
+  
+    <div class="form-row">
+      <label>Company Name</label>
+      <input type="text" [(ngModel)]="invoice.companyDetails.name">
+    </div>
+  
+    <div class="form-row">
+      <label>Address</label>
+      <input type="text" [(ngModel)]="invoice.companyDetails.address">
+    </div>
+  
+    <div class="form-row">
+      <label>Phone</label>
+      <input type="text" [(ngModel)]="invoice.companyDetails.phone">
+    </div>
+  
+    <div class="form-row">
+      <label>Email</label>
+      <input type="email" [(ngModel)]="invoice.companyDetails.email">
+    </div>
+  </div>
+
+  <div class="form-section">
+    <h2>Customer Details</h2>
+  
+    <div class="form-row">
+      <label>Customer Name</label>
+      <input type="text" [(ngModel)]="invoice.customerDetails.name">
+    </div>
+  
+    <div class="form-row">
+      <label>Company Name</label>
+      <input type="text" [(ngModel)]="invoice.customerDetails.companyName">
+    </div>
+  
+    <div class="form-row">
+      <label>Address</label>
+      <input type="text" [(ngModel)]="invoice.customerDetails.address">
+    </div>
+  
+    <div class="form-row">
+      <label>Email</label>
+      <input type="email" [(ngModel)]="invoice.customerDetails.email">
+    </div>
+  </div>  
+
+  <div class="form-section">
+    <h2>Items</h2>
+
+      <button class="btn-primary" type="button" (click)="addItem()">Add Item</button>
+
+      <table class="items-table" border="1" width="100%">
+      <thead>
+        <tr>
+          <th>Description</th>
+          <th>Quantity</th>
+          <th>Rate</th>
+          <th>Tax %</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let item of invoice.items; let i = index">
+          <td>
+            <input [(ngModel)]="item.description">
+          </td>
+          <td>
+            <input type="number" [(ngModel)]="item.quantity">
+          </td>
+          <td>
+            <input type="number" [(ngModel)]="item.rate">
+          </td>
+          <td>
+            <input type="number" [(ngModel)]="item.taxPercentage">
+          </td>
+          <td>
+            <button class="btn-danger btn-sm" type="button" (click)="removeItem(i)"> Remove </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+
+  <h2>Summary</h2>
+    <p>Subtotal: {{ getSubtotal() }}</p>
+    <p>Tax: {{ getTax() }}</p>
+    <p><strong>Total: {{ getGrandTotal() }}</strong></p>
+
+  <div class="invoice-actions">
+    <button 
+      *ngIf="!isEditMode" 
+      class="btn-primary" 
+      type="button" 
+      (click)="createInvoice()">
+      Create Invoice
+   </button>
+
+    <button 
+      *ngIf="isEditMode" 
+      class="btn-primary" 
+      type="button" 
+      (click)="updateInvoice()">
+      Update Invoice
+    </button>
+
+    <div class="pdf-actions">
+      <button
+        type="button"
+        (click)="viewPdf()">
+        View PDF
+      </button>
+  
+      <button
+        type="button"
+        (click)="downloadPdf()">
+        Download PDF
+      </button>
+    </div>
+  </div>
+</div>
+  
+  <div class="right-panel">
+    <div class="search-section">
+      <h3>Search Invoice</h3>
+      <input type="text" placeholder="Search by Invoice Number" [(ngModel)]="searchInvoiceNumber" name="searchInvoiceNumber"/>
+      <div class="button-row">
+        <button type="button" (click)="searchInvoice()">Search</button>
+    
+        <button type="button" (click)="resetSearch()"> Reset </button>
+      </div>
+    </div>
+  
+    <!-- ========================= -->
+    <!-- Single Invoice Display -->
+    <!-- ========================= -->
+    <div *ngIf="foundInvoice">
+      
+        <h4>Invoice #{{ foundInvoice.invoiceNumber }}</h4>
+        <p><strong>Date:</strong> {{ foundInvoice.invoiceDate }}</p>
+        <p><strong>Company:</strong> {{ foundInvoice.companyDetails?.name }}</p>
+        <p><strong>Customer:</strong> {{ foundInvoice.customerDetails?.name }}</p>
+        <div style="margin-top: 10px;">
+          <button (click)="enableEdit()">Edit</button>
+          <button class="btn-danger" type="button" (click)="deleteInvoice()">Delete</button>
+        </div>
+      
+      <div *ngIf="searchCompleted && !foundInvoice">
+        No invoice found
+      </div>
+    </div>
+  </div>
+</div>

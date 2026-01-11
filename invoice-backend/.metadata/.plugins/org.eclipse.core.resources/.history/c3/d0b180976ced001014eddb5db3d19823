@@ -1,0 +1,6 @@
+package com.example.invoice_generator.repository;
+
+public interface InvoiceRepository extends MongoRepository<Invoice, String> {
+
+	Optional<Invoice> findByInvoiceNumber(String invoiceNumber);
+}

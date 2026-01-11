@@ -1,0 +1,25 @@
+package com.example.invoice_generator.dto;
+
+import java.util.List;
+
+import com.example.invoice_generator.model.CompanyDetails;
+import com.example.invoice_generator.model.CustomerDetails;
+import com.example.invoice_generator.model.InvoiceItem;
+
+public class InvoiceRequest {
+	private CompanyDetails companyDetails;
+	private CustomerDetails customerDetails;
+	private List<InvoiceItem> items;
+	public Object getCompanyDetails() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	public Object getCustomerDetails() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	public Object getItems() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+}

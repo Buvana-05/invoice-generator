@@ -1,0 +1,92 @@
+package com.example.invoice_generator.controller;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.example.invoice_generator.dto.InvoiceRequest;
+import com.example.invoice_generator.dto.InvoiceResponse;
+import com.example.invoice_generator.model.Invoice;
+import com.example.invoice_generator.service.InvoiceService;
+import com.example.invoice_generator.service.PdfGenerationService;
+
+@RestController
+@CrossOrigin(origins = "http://localhost:4200")
+@RequestMapping("/api/invoices")
+public class InvoiceController {
+	private final InvoiceService invoiceService;
+	private final PdfGenerationService pdfService;
+
+	public InvoiceController(InvoiceService invoiceService, PdfGenerationService pdfService) {
+		this.invoiceService = invoiceService;
+		this.pdfService = pdfService;
+	}
+
+	@PostMapping
+	public InvoiceResponse createInvoice(@RequestBody InvoiceRequest request) {
+
+		Invoice invoice = invoiceService.createInvoice(request);
+
+		InvoiceResponse response = new InvoiceResponse();
+		response.setInvoiceId(invoice.getId());
+		response.setInvoiceNumber(invoice.getInvoiceNumber());
+		response.setGrandTotal(invoice.getGrandTotal());
+		response.setStatus(invoice.getStatus());
+
+		return response;
+	}
+	@PostMapping("/pdf")
+	public ResponseEntity<byte[]> createInvoiceAndGetPdf(@RequestBody InvoiceRequest request) {
+	    Invoice invoice = invoiceService.createInvoice(request);
+	    byte[] pdf = pdfService.generateInvoicePdf(invoice);
+
+	    return ResponseEntity.ok()
+	        .header("Content-Type", "application/pdf")
+	        .header("Content-Disposition", "inline; filename=invoice.pdf")
+	        .header("Content-Length", String.valueOf(pdf.length))
+	        .body(pdf);
+	}
+
+	@GetMapping("/{id}/pdf")
+	public ResponseEntity<byte[]> getInvoicePdf(@PathVariable String id) {
+	    Invoice invoice = invoiceService.getInvoiceById(id);
+	    byte[] pdf = pdfService.generateInvoicePdf(invoice);
+
+	    return ResponseEntity.ok()
+	        .header("Content-Type", "application/pdf")
+	        .header("Content-Disposition", "inline; filename=invoice.pdf")
+	        .header("Content-Length", String.valueOf(pdf.length))
+	        .body(pdf);
+	}
+	
+	@PutMapping("/{id}")
+	public InvoiceResponse updateInvoice(
+	        @PathVariable String id,
+	        @RequestBody InvoiceRequest request) {
+
+	    Invoice updatedInvoice = invoiceService.updateInvoice(id, request);
+
+	    InvoiceResponse response = new InvoiceResponse();
+	    response.setInvoiceId(updatedInvoice.getId());
+	    response.setInvoiceNumber(updatedInvoice.getInvoiceNumber());
+	    response.setGrandTotal(updatedInvoice.getGrandTotal());
+	    response.setStatus(updatedInvoice.getStatus());
+
+	    return response;
+	}
+	
+	@DeleteMapping("/{id}")
+	public ResponseEntity<Void> deleteInvoice(@PathVariable String id) {
+
+	    invoiceService.deleteInvoice(id);
+
+	    return ResponseEntity.noContent().build();
+	}
+}

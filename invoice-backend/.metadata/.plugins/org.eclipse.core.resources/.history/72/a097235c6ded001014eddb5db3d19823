@@ -1,0 +1,9 @@
+package com.example.invoice_generator.model;
+
+public class CompanyDetails {
+	private String name;
+	private String address;
+	private String gstNumber;
+	private String email;
+	private String phone;
+}

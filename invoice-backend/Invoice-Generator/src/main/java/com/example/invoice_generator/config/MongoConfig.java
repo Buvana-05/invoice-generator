@@ -1,0 +1,40 @@
+package com.example.invoice_generator.config;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+import com.mongodb.client.MongoClient;
+import com.mongodb.client.MongoClients;
+
+@Configuration
+@EnableMongoRepositories(basePackages = "com.invoice.repository")
+public class MongoConfig {
+
+	@Bean
+	public MongoClient mongoClient() {
+		return MongoClients.create("mongodb://localhost:27017");
+	}
+
+	@Bean
+	public MongoTemplate mongoTemplate() {
+		return new MongoTemplate(mongoClient(), "invoice_db");
+	}
+	
+	@Bean
+	public WebMvcConfigurer corsConfigurer() {
+	    return new WebMvcConfigurer() {
+	        @Override
+	        public void addCorsMappings(CorsRegistry registry) {
+	            registry.addMapping("/api/**")
+	                    .allowedOrigins("http://localhost:4200")
+	                    .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+	                    .allowedHeaders("*")
+	                    .allowCredentials(true);
+	        }
+	    };
+	}
+}

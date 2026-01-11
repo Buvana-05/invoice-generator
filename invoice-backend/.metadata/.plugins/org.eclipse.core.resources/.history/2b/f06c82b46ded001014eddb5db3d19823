@@ -1,0 +1,10 @@
+package com.example.invoice_generator.dto;
+
+import java.math.BigDecimal;
+
+public class InvoiceResponse {
+	private String invoiceId;
+	private String invoiceNumber;
+	private BigDecimal grandTotal;
+	private String status;
+}

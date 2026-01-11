@@ -1,0 +1,16 @@
+package com.example.invoice_generator.config;
+
+@Configuration
+@EnableMongoRepositories(basePackages = "com.invoice.repository")
+public class MongoConfig {
+
+    @Bean
+    public MongoClient mongoClient() {
+        return MongoClients.create("mongodb://localhost:27017");
+    }
+
+    @Bean
+    public MongoTemplate mongoTemplate() {
+        return new MongoTemplate(mongoClient(), "invoice_db");
+    }
+}

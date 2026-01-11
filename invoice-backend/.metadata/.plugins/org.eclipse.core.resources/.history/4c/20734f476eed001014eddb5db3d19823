@@ -1,0 +1,12 @@
+package com.example.invoice_generator.model;
+
+import java.math.BigDecimal;
+
+public class InvoiceItem {
+	private String description;
+	private Integer quantity;
+	private BigDecimal rate;
+	private BigDecimal taxPercentage;
+
+	private BigDecimal lineTotal;
+}

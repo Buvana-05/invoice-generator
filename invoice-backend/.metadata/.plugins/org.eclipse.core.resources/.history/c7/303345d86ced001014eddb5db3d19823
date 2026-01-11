@@ -1,0 +1,15 @@
+package com.example.invoice_generator.util;
+
+public class CalculationUtils {
+	public static BigDecimal calculateLineTotal(Integer quantity, BigDecimal rate, BigDecimal taxPercentage) {
+
+		BigDecimal base = rate.multiply(BigDecimal.valueOf(quantity));
+		BigDecimal tax = base.multiply(taxPercentage).divide(BigDecimal.valueOf(100));
+
+		return base.add(tax);
+	}
+
+	public static BigDecimal calculateSubTotal(List<InvoiceItem> items) {
+		return items.stream().map(InvoiceItem::getLineTotal).reduce(BigDecimal.ZERO, BigDecimal::add);
+	}
+}

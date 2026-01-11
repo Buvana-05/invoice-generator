@@ -1,0 +1,175 @@
+.app-header {
+  width: 100%;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.app-header h1 {
+  margin: 0;
+  font-size: 32px;
+  font-weight: bold;
+}
+
+/* Whole page layout */
+.page-container {
+  display: flex;
+  gap: 20px;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+/* Left side: form */
+.left-panel {
+  flex: 2;                /* bigger than right */
+  border: 1px solid #ddd;
+  padding: 20px;
+  border-radius: 6px;
+  background-color: #fff;
+}
+
+/* Right side: search + table */
+.right-panel {
+  flex: 1;                /* smaller than left */
+  border: 1px solid #ddd;
+  padding: 20px;
+  border-radius: 6px;
+  background-color: #fff;
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+}
+
+/* Search section */
+.search-section {
+  margin-bottom: 15px;
+}
+
+.search-section input {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 10px;
+}
+
+/* Buttons alignment */
+.search-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+/* Table styling */
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th, td {
+  padding: 8px;
+  text-align: center;
+  border: 1px solid #aaa;
+}
+
+th {
+  background-color: #f4f4f4;
+}
+
+/* Action buttons */
+.action-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
+/* Responsive fallback */
+@media (max-width: 900px) {
+  .page-container {
+    flex-direction: column;
+  }
+}
+
+/* Form sections */
+.form-section {
+  margin-bottom: 25px;
+}
+
+.form-section h3 {
+  margin-bottom: 15px;
+}
+
+/* Label + input row */
+.form-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.form-row label {
+  width: 160px;            /* label column width */
+  font-weight: 600;
+}
+
+.form-row input {
+  flex: 1;
+  padding: 8px;
+  box-sizing: border-box;
+}
+
+/* Items table inputs */
+.items-table input {
+  width: 100%;
+  padding: 6px;
+  box-sizing: border-box;
+}
+
+/* Base button */
+button {
+  padding: 8px 14px;
+  font-size: 14px;
+  border-radius: 4px;
+  border: 1px solid #444;
+  background-color: #f5f5f5;
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+/* Hover */
+button:hover {
+  background-color: #e9e9e9;
+}
+
+/* Primary action (Create / Update / Search) */
+.btn-primary {
+  background-color: #1976d2;
+  color: #fff;
+  border-color: #1976d2;
+}
+
+.btn-primary:hover {
+  background-color: #155fa0;
+}
+
+/* Secondary action (Reset, View, Cancel) */
+.btn-secondary {
+  background-color: #6c757d;
+  color: #fff;
+  border-color: #6c757d;
+}
+
+.btn-secondary:hover {
+  background-color: #565e64;
+}
+
+/* Danger action (Delete, Remove item) */
+.btn-danger {
+  background-color: #d32f2f;
+  color: #fff;
+  border-color: #d32f2f;
+}
+
+.btn-danger:hover {
+  background-color: #b71c1c;
+}
+
+/* Small buttons (table actions) */
+.btn-sm {
+  padding: 5px 10px;
+  font-size: 13px;
+}

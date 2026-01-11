@@ -1,0 +1,92 @@
+package com.example.invoice_generator.service;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.UUID;
+
+import org.springframework.stereotype.Service;
+
+import com.example.invoice_generator.dto.InvoiceRequest;
+import com.example.invoice_generator.model.Invoice;
+import com.example.invoice_generator.model.InvoiceItem;
+import com.example.invoice_generator.repository.InvoiceRepository;
+import com.example.invoice_generator.util.CalculationUtils;
+
+@Service
+public class InvoiceService {
+	private final InvoiceRepository invoiceRepository;
+
+	public InvoiceService(InvoiceRepository invoiceRepository) {
+		this.invoiceRepository = invoiceRepository;
+	}
+
+	public Invoice createInvoice(InvoiceRequest request) {
+		Invoice invoice = new Invoice();
+		invoice.setInvoiceNumber(generateInvoiceNumber());
+		invoice.setInvoiceDate(LocalDate.now());
+		invoice.setStatus("DRAFT");
+
+		invoice.setCompanyDetails(request.getCompanyDetails());
+		invoice.setCustomerDetails(request.getCustomerDetails());
+
+		List<InvoiceItem> items = request.getItems();
+
+		// ===== Null-safety for each item =====
+		for (InvoiceItem item : items) {
+			// Null-safe defaults
+			if (item.getQuantity() == null)
+				item.setQuantity(0); // quantity is Integer
+			if (item.getRate() == null)
+				item.setRate(BigDecimal.ZERO);
+			if (item.getTaxPercentage() == null)
+				item.setTaxPercentage(BigDecimal.ZERO);
+
+			// Convert Integer qty to BigDecimal for calculation
+			BigDecimal qty = BigDecimal.valueOf(item.getQuantity());
+
+			// Line total: rate * qty + tax
+			BigDecimal lineAmount = item.getRate().multiply(qty);
+			BigDecimal taxAmount = lineAmount.multiply(item.getTaxPercentage()).divide(BigDecimal.valueOf(100), 2,
+					BigDecimal.ROUND_HALF_UP);
+			BigDecimal lineTotal = lineAmount.add(taxAmount);
+
+			item.setLineTotal(lineTotal);
+		}
+
+		invoice.setItems(items);
+
+		// ===== Calculate totals safely =====
+		BigDecimal subTotal = BigDecimal.ZERO;
+		BigDecimal taxTotal = BigDecimal.ZERO;
+
+		for (InvoiceItem item : items) {
+			BigDecimal qty = BigDecimal.valueOf(item.getQuantity());
+			BigDecimal lineAmount = item.getRate().multiply(qty);
+			BigDecimal taxAmount = lineAmount.multiply(item.getTaxPercentage()).divide(BigDecimal.valueOf(100), 2,
+					BigDecimal.ROUND_HALF_UP);
+
+			subTotal = subTotal.add(lineAmount);
+			taxTotal = taxTotal.add(taxAmount);
+		}
+
+		invoice.setSubTotal(subTotal);
+		invoice.setTaxAmount(taxTotal);
+		invoice.setGrandTotal(subTotal.add(taxTotal));
+
+		return invoiceRepository.save(invoice);
+	}
+
+	public Invoice getInvoiceById(String id) {
+		return invoiceRepository.findById(id)
+				.orElseThrow(() -> new RuntimeException("Invoice not found with id: " + id));
+	}
+
+	private String generateInvoiceNumber() {
+		return "INV-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+	}
+
+	public List<Invoice> getAllInvoices() {
+		return invoiceRepository.findAll();
+	}
+}

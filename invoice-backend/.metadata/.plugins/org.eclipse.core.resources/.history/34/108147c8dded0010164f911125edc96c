@@ -1,0 +1,111 @@
+package com.example.invoice_generator.service;
+
+import java.io.ByteArrayOutputStream;
+
+import org.springframework.stereotype.Service;
+
+import com.example.invoice_generator.model.Invoice;
+import com.example.invoice_generator.model.InvoiceItem;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.Element;
+import com.itextpdf.text.Font;
+import com.itextpdf.text.Paragraph;
+import com.itextpdf.text.Phrase;
+import com.itextpdf.text.pdf.PdfPCell;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfWriter;
+
+@Service
+public class PdfGenerationService {
+	public byte[] generateInvoicePdf(Invoice invoice) {
+
+		try {
+			ByteArrayOutputStream out = new ByteArrayOutputStream();
+			Document document = new Document();
+			PdfWriter.getInstance(document, out);
+
+			document.open();
+
+			Font titleFont = new Font(Font.FontFamily.HELVETICA, 16, Font.BOLD);
+			Font boldFont = new Font(Font.FontFamily.HELVETICA, 10, Font.BOLD);
+			Font normalFont = new Font(Font.FontFamily.HELVETICA, 10);
+
+			// ===== TITLE =====
+			Paragraph title = new Paragraph("INVOICE", titleFont);
+			title.setAlignment(Element.ALIGN_CENTER);
+			document.add(title);
+			document.add(new Paragraph(" "));
+
+			// ===== INVOICE META =====
+			document.add(new Paragraph("Invoice Number: " + invoice.getInvoiceNumber(), normalFont));
+			document.add(new Paragraph("Invoice Date: " + invoice.getInvoiceDate(), normalFont));
+			document.add(new Paragraph("Status: " + invoice.getStatus(), normalFont));
+			document.add(new Paragraph(" "));
+
+			// ===== COMPANY DETAILS =====
+			document.add(new Paragraph("Company Details", boldFont));
+			document.add(new Paragraph(invoice.getCompanyDetails().getName(), normalFont));
+			document.add(new Paragraph(invoice.getCompanyDetails().getAddress(), normalFont));
+			document.add(new Paragraph("GST: " + invoice.getCompanyDetails().getGstNumber(), normalFont));
+			document.add(new Paragraph("Email: " + invoice.getCompanyDetails().getEmail(), normalFont));
+			document.add(new Paragraph("Phone: " + invoice.getCompanyDetails().getPhone(), normalFont));
+			document.add(new Paragraph(" "));
+
+			// ===== CUSTOMER DETAILS =====
+			document.add(new Paragraph("Customer Details", boldFont));
+			document.add(new Paragraph(invoice.getCustomerDetails().getName(), normalFont));
+			document.add(new Paragraph(invoice.getCustomerDetails().getCompanyName(), normalFont));
+			document.add(new Paragraph(invoice.getCustomerDetails().getAddress(), normalFont));
+			document.add(new Paragraph("GST: " + invoice.getCustomerDetails().getGstNumber(), normalFont));
+			document.add(new Paragraph("Email: " + invoice.getCustomerDetails().getEmail(), normalFont));
+			document.add(new Paragraph(" "));
+
+			// ===== ITEMS TABLE =====
+			PdfPTable table = new PdfPTable(6);
+			table.setWidthPercentage(100);
+			table.setSpacingBefore(10);
+			table.setWidths(new float[] { 3, 1, 1, 1, 1, 1 });
+
+			addHeaderCell(table, "Description");
+			addHeaderCell(table, "Qty");
+			addHeaderCell(table, "Rate");
+			addHeaderCell(table, "Tax %");
+			addHeaderCell(table, "Tax Amt");
+			addHeaderCell(table, "Line Total");
+
+			for (InvoiceItem item : invoice.getItems()) {
+				table.addCell(new Phrase(item.getDescription(), normalFont));
+				table.addCell(new Phrase(String.valueOf(item.getQuantity()), normalFont));
+				table.addCell(new Phrase(item.getRate().toString(), normalFont));
+				table.addCell(new Phrase(item.getTaxPercentage().toString(), normalFont));
+
+				// Tax amount = lineTotal - (qty * rate)
+				table.addCell(new Phrase(item.getLineTotal()
+						.subtract(item.getRate().multiply(new java.math.BigDecimal(item.getQuantity()))).toString(),
+						normalFont));
+
+				table.addCell(new Phrase(item.getLineTotal().toString(), normalFont));
+			}
+
+			document.add(table);
+			document.add(new Paragraph(" "));
+
+			// ===== TOTALS =====
+			document.add(new Paragraph("Subtotal: " + invoice.getSubTotal(), boldFont));
+			document.add(new Paragraph("Grand Total: " + invoice.getGrandTotal(), boldFont));
+
+			document.close();
+			return out.toByteArray();
+
+		} catch (Exception e) {
+			throw new RuntimeException("PDF generation failed", e);
+		}
+	}
+
+	private void addHeaderCell(PdfPTable table, String text) {
+		Font headerFont = new Font(Font.FontFamily.HELVETICA, 10, Font.BOLD);
+		PdfPCell cell = new PdfPCell(new Phrase(text, headerFont));
+		cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+		table.addCell(cell);
+	}
+}

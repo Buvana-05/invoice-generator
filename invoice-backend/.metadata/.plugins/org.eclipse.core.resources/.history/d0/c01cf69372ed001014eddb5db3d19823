@@ -1,0 +1,19 @@
+package com.example.invoice_generator.service;
+
+import org.springframework.stereotype.Service;
+
+import com.example.invoice_generator.model.Invoice;
+
+@Service
+public class PdfGenerationService {
+	public byte[] generateInvoicePdf(Invoice invoice) {
+
+		// Input: fully prepared Invoice object
+		// Output: PDF byte[]
+
+		// Internally uses a PDF library like iText or ReportLab-style logic
+		// Builds header, table, totals, footer
+
+		return new byte[0]; // placeholder
+	}
+}

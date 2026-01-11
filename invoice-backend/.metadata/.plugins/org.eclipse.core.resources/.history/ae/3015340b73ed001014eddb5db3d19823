@@ -1,0 +1,49 @@
+package com.example.invoice_generator.service;
+
+import java.io.ByteArrayOutputStream;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.font.PDType1Font;
+import org.springframework.stereotype.Service;
+import com.example.invoice_generator.model.Invoice;
+
+@Service
+public class PdfGenerationService {
+	public byte[] generateInvoicePdf(Invoice invoice) {
+		try (PDDocument document = new PDDocument(); ByteArrayOutputStream out = new ByteArrayOutputStream()) {
+
+			PDPage page = new PDPage();
+			document.addPage(page);
+
+			try (PDPageContentStream content = new PDPageContentStream(document, page)) {
+				content.beginText();
+				content.setFont(PDType1Font.HELVETICA_BOLD, 16);
+				content.newLineAtOffset(50, 750);
+				content.showText("Invoice Details");
+				content.endText();
+
+				content.beginText();
+				content.setFont(PDType1Font.HELVETICA, 12);
+				content.newLineAtOffset(50, 720);
+				content.showText("Invoice ID: " + invoice.getId());
+				content.newLineAtOffset(0, -18);
+				content.showText("Invoice Number: " + invoice.getInvoiceNumber());
+				content.newLineAtOffset(0, -18);
+				content.showText("Customer Name: " + invoice.getCustomerName());
+				content.newLineAtOffset(0, -18);
+				content.showText("Grand Total: " + invoice.getGrandTotal());
+				content.newLineAtOffset(0, -18);
+				content.showText("Status: " + invoice.getStatus());
+				content.endText();
+			}
+
+			document.save(out);
+			return out.toByteArray();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new byte[0];
+		}
+	}
+}

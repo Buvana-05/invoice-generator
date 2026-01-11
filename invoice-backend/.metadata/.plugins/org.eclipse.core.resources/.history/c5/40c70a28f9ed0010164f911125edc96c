@@ -1,0 +1,108 @@
+package com.example.invoice_generator.service;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.UUID;
+
+import org.springframework.stereotype.Service;
+
+import com.example.invoice_generator.dto.InvoiceRequest;
+import com.example.invoice_generator.model.CompanyDetails;
+import com.example.invoice_generator.model.CustomerDetails;
+import com.example.invoice_generator.model.Invoice;
+import com.example.invoice_generator.model.InvoiceItem;
+import com.example.invoice_generator.repository.InvoiceRepository;
+
+@Service
+public class InvoiceService {
+	private final InvoiceRepository invoiceRepository;
+
+	public InvoiceService(InvoiceRepository invoiceRepository) {
+		this.invoiceRepository = invoiceRepository;
+	}
+
+	public Invoice createInvoice(InvoiceRequest request) {
+		Invoice invoice = new Invoice();
+		invoice.setInvoiceNumber(generateInvoiceNumber());
+		invoice.setInvoiceDate(LocalDate.now());
+		invoice.setStatus("DRAFT");
+
+		// ===== Ensure nested objects are not null =====
+		if (request.getCompanyDetails() != null) {
+			invoice.setCompanyDetails(request.getCompanyDetails());
+		} else {
+			invoice.setCompanyDetails(new CompanyDetails());
+		}
+
+		if (request.getCustomerDetails() != null) {
+			invoice.setCustomerDetails(request.getCustomerDetails());
+		} else {
+			invoice.setCustomerDetails(new CustomerDetails());
+		}
+
+		List<InvoiceItem> items = request.getItems();
+
+		// ===== Null-safety for items =====
+		if (items != null && !items.isEmpty()) {
+			for (InvoiceItem item : items) {
+				if (item.getQuantity() == null)
+					item.setQuantity(0);
+				if (item.getRate() == null)
+					item.setRate(BigDecimal.ZERO);
+				if (item.getTaxPercentage() == null)
+					item.setTaxPercentage(BigDecimal.ZERO);
+
+				// Convert qty to BigDecimal for calculation
+				BigDecimal qty = BigDecimal.valueOf(item.getQuantity());
+
+				// Line total: rate * qty + tax
+				BigDecimal lineAmount = item.getRate().multiply(qty);
+				BigDecimal taxAmount = lineAmount.multiply(item.getTaxPercentage()).divide(BigDecimal.valueOf(100), 2,
+						BigDecimal.ROUND_HALF_UP);
+				BigDecimal lineTotal = lineAmount.add(taxAmount);
+
+				item.setLineTotal(lineTotal);
+			}
+			invoice.setItems(items);
+		} else {
+			invoice.setItems(List.of());
+		}
+
+		// ===== Calculate totals =====
+		BigDecimal subTotal = BigDecimal.ZERO;
+		BigDecimal taxTotal = BigDecimal.ZERO;
+
+		for (InvoiceItem item : invoice.getItems()) {
+			BigDecimal qty = BigDecimal.valueOf(item.getQuantity());
+			BigDecimal lineAmount = item.getRate().multiply(qty);
+			BigDecimal taxAmount = lineAmount.multiply(item.getTaxPercentage()).divide(BigDecimal.valueOf(100), 2,
+					BigDecimal.ROUND_HALF_UP);
+
+			subTotal = subTotal.add(lineAmount);
+			taxTotal = taxTotal.add(taxAmount);
+		}
+
+		invoice.setSubTotal(subTotal);
+		invoice.setTaxAmount(taxTotal);
+		invoice.setGrandTotal(subTotal.add(taxTotal));
+
+		// ===== Save to MongoDB =====
+		Invoice savedInvoice = invoiceRepository.save(invoice);
+		System.out.println("Saved invoice ID: " + savedInvoice.getId());
+		return savedInvoice;
+	}
+
+	public Invoice getInvoiceById(String id) {
+		return invoiceRepository.findById(id)
+				.orElseThrow(() -> new RuntimeException("Invoice not found with id: " + id));
+	}
+
+	private String generateInvoiceNumber() {
+		return "INV-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+	}
+
+	public List<Invoice> getAllInvoices() {
+		return invoiceRepository.findAll();
+	}
+}

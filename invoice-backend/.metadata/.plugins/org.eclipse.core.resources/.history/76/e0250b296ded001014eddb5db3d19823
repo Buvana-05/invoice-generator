@@ -1,0 +1,61 @@
+package com.example.invoice_generator.model;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
+
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
+
+@Document(collection = "invoices")
+public class Invoice {
+
+    @Id
+    private String id;
+
+    private String invoiceNumber;
+    private LocalDate invoiceDate;
+    private String status;
+
+    private CompanyDetails companyDetails;
+    private CustomerDetails customerDetails;
+
+    private List<InvoiceItem> items;
+
+    private BigDecimal subTotal;
+    private BigDecimal taxAmount;
+    private BigDecimal grandTotal;
+
+    private LocalDateTime createdAt;
+
+	public void setInvoiceNumber(Object invoiceNumber2) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void setInvoiceDate(LocalDate now) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void setStatus(String string) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void setCompanyDetails(Object companyDetails2) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void setCustomerDetails(Object customerDetails2) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public void setItems(Object items2) {
+		// TODO Auto-generated method stub
+		
+	}
+}

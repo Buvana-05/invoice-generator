@@ -1,0 +1,5 @@
+package com.example.invoice_generator.repository;
+
+public interface InvoiceRepository {
+
+}

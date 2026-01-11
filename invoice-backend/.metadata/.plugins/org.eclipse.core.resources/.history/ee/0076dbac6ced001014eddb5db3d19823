@@ -1,0 +1,7 @@
+package com.example.invoice_generator.dto;
+
+public class InvoiceRequest {
+	private CompanyDetails companyDetails;
+	private CustomerDetails customerDetails;
+	private List<InvoiceItem> items;
+}

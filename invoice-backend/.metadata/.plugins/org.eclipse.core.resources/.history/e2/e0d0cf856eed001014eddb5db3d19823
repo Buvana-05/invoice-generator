@@ -1,0 +1,51 @@
+package com.example.invoice_generator.service;
+
+import java.time.LocalDate;
+
+import org.springframework.stereotype.Service;
+
+import com.example.invoice_generator.dto.InvoiceRequest;
+import com.example.invoice_generator.model.Invoice;
+import com.example.invoice_generator.repository.InvoiceRepository;
+import com.example.invoice_generator.util.CalculationUtils;
+
+@Service
+public class InvoiceService {
+	private final InvoiceRepository invoiceRepository;
+
+    public InvoiceService(InvoiceRepository invoiceRepository) {
+        this.invoiceRepository = invoiceRepository;
+    }
+
+    public Invoice createInvoice(InvoiceRequest request) {
+
+        Invoice invoice = new Invoice();
+        invoice.setInvoiceNumber(generateInvoiceNumber());
+        invoice.setInvoiceDate(LocalDate.now());
+        invoice.setStatus("DRAFT");
+
+        invoice.setCompanyDetails(request.getCompanyDetails());
+        invoice.setCustomerDetails(request.getCustomerDetails());
+
+        request.getItems().forEach(item -> {
+            BigDecimal lineTotal =
+                CalculationUtils.calculateLineTotal(
+                    item.getQuantity(),
+                    item.getRate(),
+                    item.getTaxPercentage()
+                );
+            item.setLineTotal(lineTotal);
+        });
+
+        invoice.setItems(request.getItems());
+        invoice.setSubTotal(CalculationUtils.calculateSubTotal(request.getItems()));
+        invoice.setGrandTotal(invoice.getSubTotal());
+
+        return invoiceRepository.save(invoice);
+    }
+
+	private Object generateInvoiceNumber() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+}

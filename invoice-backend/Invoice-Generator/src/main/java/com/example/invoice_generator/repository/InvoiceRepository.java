@@ -1,0 +1,10 @@
+package com.example.invoice_generator.repository;
+
+import java.util.Optional;
+
+import org.springframework.data.mongodb.repository.MongoRepository;
+import com.example.invoice_generator.model.Invoice;
+
+public interface InvoiceRepository extends MongoRepository<Invoice, String> {
+	Optional<Invoice> findByInvoiceNumber(String invoiceNumber);
+}
